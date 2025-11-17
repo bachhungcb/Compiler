@@ -52,7 +52,7 @@ void sort_index_table();
 void append_line_number(int index, int line_num);
 
 // --- MAIN ENTRY
-int main(char *argv[])
+int main(int argc, char *argv[])
 {
 
     char *filename = (argv[1] != NULL) ? argv[1] : "alice30.txt";
