@@ -37,7 +37,7 @@ $(TARGET): $(SRC)
 # Rule chạy chương trình (tiện lợi: gõ 'make run')
 run: $(TARGET)
 	@echo "--- Dang chay chuong trinh ---"
-	./$(TARGET)
+	./$(TARGET) > out.txt
 
 # Rule dọn dẹp: Xóa file thực thi để build lại từ đầu
 clean:

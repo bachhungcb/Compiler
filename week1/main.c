@@ -4,7 +4,7 @@
 #include <ctype.h>
 
 // --- BUFFER SIZE CONFIG
-#define MAX_WORDS 10000         /*Number of maximum words in index table*/
+#define MAX_WORDS 10000        /*Number of maximum words in index table*/
 #define MAX_STOP_WORDS 100     /*Number of maximum stop words*/
 #define MAX_WORD_LEN 50        /*Word length*/
 #define MAX_LINE_LIST_LEN 1000 /*MAximum length of line*/
@@ -52,16 +52,11 @@ void sort_index_table();
 void append_line_number(int index, int line_num);
 
 // --- MAIN ENTRY
-int main(int argc, char *argv[])
+int main(char *argv[])
 {
-    if (argc != 2)
-    {
-        printf("Invalid number of arguments\n");
-        printf("Usage: %s <file_name>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
 
-    char *filename = argv[1];
+    char *filename = (argv[1] != NULL) ? argv[1] : "alice30.txt";
+
     // Step 1. Load black list
     load_stop_words("stopw.txt");
 
@@ -188,6 +183,11 @@ void process_word(char *raw_word, int line_num, int is_start_sentence)
     // 2. Sanitization: Into lower case
     to_lowercase(raw_word);
 
+    // 0. Ban alice
+    if (strcmp(raw_word, "alice") == 0)
+    {
+        return; // Alice == cook
+    }
     // 3. Filtering: Check stop Words
     if (is_stop_word(raw_word))
     {
@@ -318,12 +318,15 @@ void append_line_number(int index, int line_num)
     }
 }
 
-int is_stop_word(const char *word) {
+int is_stop_word(const char *word)
+{
     // Duyệt qua toàn bộ danh sách các từ đã nạp vào stop_words
-    for (int i = 0; i < stop_word_count; i++) {
+    for (int i = 0; i < stop_word_count; i++)
+    {
         // So sánh chuỗi đầu vào 'word' với từ trong danh sách 'stop_words[i]'
         // Hàm strcmp trả về 0 nếu 2 chuỗi giống hệt nhau
-        if (strcmp(stop_words[i], word) == 0) {
+        if (strcmp(stop_words[i], word) == 0)
+        {
             return 1; // Trả về 1 (True) nếu là stop word -> Cần loại bỏ
         }
     }
@@ -332,7 +335,8 @@ int is_stop_word(const char *word) {
 
 // Hàm so sánh phụ trợ cho qsort
 // Nhiệm vụ: So sánh 2 phần tử WordIndex dựa trên trường 'word'
-int compare_word_index(const void *a, const void *b) {
+int compare_word_index(const void *a, const void *b)
+{
     // Ép kiểu con trỏ void* về kiểu struct WordIndex*
     const WordIndex *entryA = (const WordIndex *)a;
     const WordIndex *entryB = (const WordIndex *)b;
@@ -344,13 +348,14 @@ int compare_word_index(const void *a, const void *b) {
 }
 
 // Hàm sắp xếp chính
-void sort_index_table() {
+void sort_index_table()
+{
     // Gọi hàm qsort chuẩn của thư viện C
     // - index_table: Mảng cần sắp xếp
     // - index_count: Số lượng phần tử thực tế trong mảng
     // - sizeof(WordIndex): Kích thước của 1 phần tử (để qsort biết bước nhảy bộ nhớ)
     // - compare_word_index: Hàm so sánh logic do ta tự viết
     qsort(index_table, index_count, sizeof(WordIndex), compare_word_index);
-    
+
     printf("[INFO] Table sorted. Total unique words: %d\n", index_count);
 }
