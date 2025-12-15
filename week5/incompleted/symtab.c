@@ -314,7 +314,37 @@ void exitBlock(void) {
 }
 
 Object* lookupObject(char *name) {
-  // TODO
+  // Bắt đầu quy trình Phân giải tên (Name Resolution) từ Scope hiện tại
+  Scope* scope = symtab->currentScope;
+  ObjectNode* node;
+
+  // Chiến lược duyệt: Bottom-Up (Từ dưới lên / Từ trong ra ngoài)
+  // Ưu tiên biến cục bộ (Local) trước, sau đó mới đến toàn cục (Global)
+  while (scope != NULL) {
+    
+    // Lấy node đầu tiên trong danh sách đối tượng của scope này
+    node = scope->objList; // Giả định struct Scope có trường objList là ObjectNode*
+
+    // Duyệt tuyến tính (Linear Scan) qua danh sách liên kết các node
+    while (node != NULL) {
+      // Truy cập vào đối tượng thực tế qua con trỏ 'object' trong node
+      if (strcmp(node->object->name, name) == 0) {
+        // [Security] Object Found
+        // Trả về ngay lập tức khi tìm thấy để đảm bảo quy tắc "Shadowing"
+        // (Biến trong scope con sẽ che khuất biến cùng tên ở scope cha)
+        return node->object;
+      }
+      
+      // Chuyển sang node tiếp theo
+      node = node->next;
+    }
+
+    // Nếu không tìm thấy trong scope hiện tại, leo thang lên scope bao đóng (Outer Scope)
+    scope = scope->outer;
+  }
+
+  // [Fallback] Trả về NULL nếu định danh không tồn tại trong bất kỳ phạm vi nào
+  return NULL;
 }
 
 void declareObject(Object* obj) {
