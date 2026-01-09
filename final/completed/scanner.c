@@ -230,35 +230,32 @@ Token *getToken(void)
     token = makeToken(SB_SEMICOLON, lineNo, colNo);
     readChar();
     return token;
-  case CHAR_COLON:
-    ln = lineNo;
-    cn = colNo;
-    readChar(); // Đọc ký tự tiếp theo
+case CHAR_COLON:
+      ln = lineNo;
+      cn = colNo;
+      readChar(); // Đọc qua dấu : đầu tiên
 
-    if (currentChar == CHAR_EQ)
-    { // Trường hợp :=
-      readChar();
-      return makeToken(SB_ASSIGN, ln, cn);
-    }
-    else if (currentChar == CHAR_COLON)
-    {             // Trường hợp ::...
-      readChar(); // Đọc ký tự sau dấu : thứ 2
-      if (currentChar == CHAR_EQ)
-      { // Trường hợp ::=
+      if ((currentChar != EOF) &&charCodes[currentChar] == CHAR_EQ) { 
+        // Trường hợp 1: Gặp dấu = ngay lập tức -> Là dấu gán chuẩn :=
         readChar();
-        return makeToken(SB_ASSIGN2, ln, cn);
+        return makeToken(SB_ASSIGN, ln, cn);
+      } 
+      else if ((currentChar != EOF) && charCodes[currentChar] == CHAR_COLON) { 
+        // Trường hợp 2: Gặp dấu : tiếp theo -> Có thể là ::=
+        readChar();
+        if ((currentChar != EOF) && charCodes[currentChar] == CHAR_EQ) {
+            readChar();
+            return makeToken(SB_ASSIGN2, ln, cn); // Token mới ::=
+        } else {
+            // Nếu chỉ có :: mà không có =, báo lỗi
+            error(ERR_INVALID_SYMBOL, ln, cn);
+            return makeToken(TK_NONE, ln, cn);
+        }
+      } 
+      else {
+        // Trường hợp 3: Không gặp = hay : -> Là dấu : đơn lẻ
+        return makeToken(SB_COLON, ln, cn);
       }
-      else
-      {
-        // Nếu KPL không hỗ trợ :: thì đây là lỗi token
-        error(ERR_INVALID_SYMBOL, ln, cn);
-        return makeToken(TK_NONE, ln, cn);
-      }
-    }
-    else
-    { // Trường hợp : thường
-      return makeToken(SB_COLON, ln, cn);
-    }
   case CHAR_SINGLEQUOTE:
     return readConstChar();
   case CHAR_LPAR:
