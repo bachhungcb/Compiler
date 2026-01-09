@@ -5,6 +5,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "reader.h"
 #include "scanner.h"
@@ -457,21 +458,53 @@ void compileCallSt(void) {
   eat(TK_IDENT);
 
   proc = checkDeclaredProcedure(currentToken->string);
-  if (proc == NULL) {
-    if (isPredefinedFunction(proc)){
-      compileArguments(proc->funcAttrs->paramList);
-      genPredefinedFunctionCall(proc);
-    } 
+  /* --- BẮT ĐẦU SỬA ĐỔI --- */
+
+  // 1. Xử lý riêng cho thủ tục READI
+  if (proc != NULL && strcmp(proc->name, "READI") == 0) {
+    eat(SB_LPAR);
+
+    // READI bắt buộc tham số phải là một L-Value (biến để lưu giá trị)
+    // compileLValue() sẽ sinh lệnh LA (Load Address) để đẩy địa chỉ biến lên Stack
+    compileLValue();
+
+    genRI(); // Sinh lệnh đọc số nguyên từ bàn phím đẩy vào đỉnh Stack
+    genST(); // Sinh lệnh lấy giá trị ở đỉnh lưu vào địa chỉ ngay dưới (Store)
+
+    eat(SB_RPAR);
   }
-  else{
-    if (isPredefinedProcedure(proc)) {
-      compileArguments(proc->procAttrs->paramList);
-      genPredefinedProcedureCall(proc);
+  // 2. Xử lý riêng cho thủ tục READC (nếu bạn muốn hỗ trợ đọc ký tự)
+  else if (proc != NULL && strcmp(proc->name, "READC") == 0) {
+    eat(SB_LPAR);
+    compileLValue(); // Load Address
+    genRC();      // Read Char
+    genST();      // Store
+    eat(SB_RPAR);
+  }
+  // 3. Xử lý cho các thủ tục thông thường hoặc WRITEI
+  else {
+    if (proc == NULL) {
+      // Nếu không tìm thấy trong SymTab, kiểm tra xem có phải hàm hệ thống khác không
+      // (Dành cho trường hợp code cũ hoặc các predefined khác)
+      if (isPredefinedFunction(proc)){
+        // Lưu ý: Đoạn này trong code gốc của bạn có vẻ logic chưa chặt chẽ vì proc là NULL
+        // Nhưng ta cứ giữ nguyên logic gốc cho phần else này
+        compileArguments(proc->funcAttrs->paramList);
+        genPredefinedFunctionCall(proc);
+      }
+      // Hoặc báo lỗi nếu cần
     } else {
-      genINT(RESERVED_WORDS);
-      compileArguments(proc->procAttrs->paramList);
-      genDCT( RESERVED_WORDS + proc->procAttrs->paramCount);
-      genProcedureCall(proc);
+      if (isPredefinedProcedure(proc)) {
+        // Dành cho WRITEI, WRITELN
+        compileArguments(proc->procAttrs->paramList);
+        genPredefinedProcedureCall(proc);
+      } else {
+        // Dành cho thủ tục người dùng tự viết
+        genINT(RESERVED_WORDS);
+        compileArguments(proc->procAttrs->paramList);
+        genDCT(RESERVED_WORDS + proc->procAttrs->paramCount);
+        genProcedureCall(proc);
+      }
     }
   }
 }

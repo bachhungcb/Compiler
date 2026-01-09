@@ -1,0 +1,21 @@
+Program KiemTraSo;
+var n: Integer;
+		i: Integer;
+Begin
+	Call ReadI(n);
+
+	(*Cau truc IF-ELSE*)
+	If n < 0 Then
+		Call WriteC('-')
+	Else
+		Call WriteC('+');
+
+	Call WriteLn;
+
+	(*FOR loops*)
+	For i:=1 To 5 Do
+		Begin
+			Call WriteI(i);
+			Call WriteC(' ');
+		End;
+End.
