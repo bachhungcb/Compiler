@@ -11,7 +11,7 @@
 #include "instructions.h"
 
 #define RESERVED_WORDS 4
-
+        
 #define PROCEDURE_PARAM_COUNT(proc) (proc->procAttrs->numOfParams)
 #define PROCEDURE_SCOPE(proc) (proc->procAttrs->scope)
 #define PROCEDURE_FRAME_SIZE(proc) (proc->procAttrs->scope->frameSize)
@@ -84,6 +84,7 @@ void genGT(void);
 void genGE(void);
 void genLT(void);
 void genLE(void);
+void genSW(void);
 
 void updateJ(Instruction* jmp, CodeAddress label);
 void updateFJ(Instruction* jmp, CodeAddress label);

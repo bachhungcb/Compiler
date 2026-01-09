@@ -27,6 +27,8 @@ Object *writecProcedure;
 Object *writelnProcedure;
 Object *readiFunction;
 Object *readcFunction;
+Object *readiProcedure;
+Object *readcProcedure;
 
 /******************* Type utilities ******************************/
 
@@ -303,7 +305,7 @@ void initSymTab(void) {
     symtab->program = NULL;
     symtab->currentScope = NULL;
 
-    Object* readcProcedure = createProcedureObject("READC");
+    readcProcedure = createProcedureObject("READC");
     declareObject(readcProcedure);
     enterBlock(readcProcedure->procAttrs->scope);
         // Tham số ch: Phải là PARAM_REFERENCE
@@ -312,7 +314,7 @@ void initSymTab(void) {
         declareObject(param);
     exitBlock();
 
-    Object *readiProcedure = createProcedureObject("READI");
+    readiProcedure = createProcedureObject("READI");
     declareObject(readiProcedure);
     enterBlock(readiProcedure->procAttrs->scope);
         // Tham số n: Phải là PARAM_REFERENCE để lưu giá trị đọc được vào n

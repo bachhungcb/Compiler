@@ -1,0 +1,56 @@
+Program bubbleSort;
+Type MyArray = Array(. 50 .) of Integer;
+Var arr: MyArray;
+		n: Integer;
+		i: Integer;
+		j: Integer;
+
+Procedure inputArray;
+Begin
+	Call WriteC('N'); Call WriteC('=');
+	Call ReadI(n);
+	For i := 1 To n Do
+	Begin
+		Call WriteC('A'); Call WriteC('['); Call WriteI(i); Call WriteC(']'); Call WriteC('=');
+		Call ReadI(arr(. i .));
+	End;
+End;
+
+Procedure Swap (VAR a: Integer; VAR b: Integer);
+VAR temp: Integer;
+Begin
+	temp := a;
+	a := b;
+	b := temp;
+End;
+
+Procedure PrintArray;
+Begin
+	For i:=1 to n Do
+	Begin
+				Call WriteC('A'); Call WriteC('['); Call WriteI(i); Call WriteC(']'); Call WriteC('='); 
+				Call WriteI(arr(. i .));
+                Call WriteC(' ');
+	End;
+    Call Writeln;
+End;
+
+
+Procedure Sort;
+Begin
+For i := 1 To n - 1 Do
+	Begin
+	    For j := i + 1 To n Do
+	    Begin
+        If arr(. i .) > arr(. j .) Then
+          Call Swap( arr(. i .), arr(. j .) )
+	    End;
+	End;
+End;
+
+Begin
+	Call inputArray;
+	Call PrintArray;
+	Call Sort;
+	Call PrintArray;
+End.

@@ -1,0 +1,14 @@
+Program testAssign;
+Var x : Integer;
+    y : Integer;
+
+Begin
+    x := 10;
+    y := 20;
+    Call WriteC('x'); Call WriteC('='); Call WriteI(x); Call WriteC(' ');
+    Call WriteC('y'); Call WriteC('='); Call WriteI(y); Call WriteC(' ');
+    Call WriteLn;
+    x, y := y, x;
+    Call WriteC('x'); Call WriteC('='); Call WriteI(x);Call WriteC(' ');
+    Call WriteC('y'); Call WriteC('='); Call WriteI(y);
+End.

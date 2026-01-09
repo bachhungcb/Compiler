@@ -1,4 +1,4 @@
-/* 
+/*
  * @copyright (c) 2008, Hedspi, Hanoi University of Technology
  * @author Huu-Duc Nguyen
  * @version 1.0
@@ -18,26 +18,35 @@
 Token *currentToken;
 Token *lookAhead;
 
-extern Type* intType;
-extern Type* charType;
-extern SymTab* symtab;
+extern Type *intType;
+extern Type *charType;
+extern SymTab *symtab;
+extern Object *readcProcedure;
+extern Object *readiProcedure;
+#define MAX_VARS 50
 
-void scan(void) {
-  Token* tmp = currentToken;
+void scan(void)
+{
+  Token *tmp = currentToken;
   currentToken = lookAhead;
   lookAhead = getValidToken();
   free(tmp);
 }
 
-void eat(TokenType tokenType) {
-  if (lookAhead->tokenType == tokenType) {
+void eat(TokenType tokenType)
+{
+  if (lookAhead->tokenType == tokenType)
+  {
     //    printToken(lookAhead);
     scan();
-  } else missingToken(tokenType, lookAhead->lineNo, lookAhead->colNo);
+  }
+  else
+    missingToken(tokenType, lookAhead->lineNo, lookAhead->colNo);
 }
 
-void compileProgram(void) {
-  Object* program;
+void compileProgram(void)
+{
+  Object *program;
 
   eat(KW_PROGRAM);
   eat(TK_IDENT);
@@ -56,71 +65,81 @@ void compileProgram(void) {
   exitBlock();
 }
 
-void compileConstDecls(void) {
-  Object* constObj;
-  ConstantValue* constValue;
+void compileConstDecls(void)
+{
+  Object *constObj;
+  ConstantValue *constValue;
 
-  if (lookAhead->tokenType == KW_CONST) {
+  if (lookAhead->tokenType == KW_CONST)
+  {
     eat(KW_CONST);
-    do {
+    do
+    {
       eat(TK_IDENT);
       checkFreshIdent(currentToken->string);
       constObj = createConstantObject(currentToken->string);
       declareObject(constObj);
-      
+
       eat(SB_EQ);
       constValue = compileConstant();
       constObj->constAttrs->value = constValue;
-      
+
       eat(SB_SEMICOLON);
     } while (lookAhead->tokenType == TK_IDENT);
   }
 }
 
-void compileTypeDecls(void) {
-  Object* typeObj;
-  Type* actualType;
+void compileTypeDecls(void)
+{
+  Object *typeObj;
+  Type *actualType;
 
-  if (lookAhead->tokenType == KW_TYPE) {
+  if (lookAhead->tokenType == KW_TYPE)
+  {
     eat(KW_TYPE);
-    do {
+    do
+    {
       eat(TK_IDENT);
-      
+
       checkFreshIdent(currentToken->string);
       typeObj = createTypeObject(currentToken->string);
       declareObject(typeObj);
-      
+
       eat(SB_EQ);
       actualType = compileType();
       typeObj->typeAttrs->actualType = actualType;
-      
+
       eat(SB_SEMICOLON);
     } while (lookAhead->tokenType == TK_IDENT);
-  } 
+  }
 }
 
-void compileVarDecls(void) {
-  Object* varObj;
-  Type* varType;
+void compileVarDecls(void)
+{
+  Object *varObj;
+  Type *varType;
 
-  if (lookAhead->tokenType == KW_VAR) {
+  if (lookAhead->tokenType == KW_VAR)
+  {
     eat(KW_VAR);
-    do {
+    do
+    {
       eat(TK_IDENT);
       checkFreshIdent(currentToken->string);
       varObj = createVariableObject(currentToken->string);
       eat(SB_COLON);
       varType = compileType();
       varObj->varAttrs->type = varType;
-      declareObject(varObj);      
+      declareObject(varObj);
       eat(SB_SEMICOLON);
     } while (lookAhead->tokenType == TK_IDENT);
-  } 
+  }
 }
 
-void compileBlock(void) {
-  Instruction* jmp;
-  
+void compileBlock(void)
+{
+  Instruction *jmp;
+
   jmp = genJ(DC_VALUE);
 
   compileConstDecls();
@@ -128,7 +147,7 @@ void compileBlock(void) {
   compileVarDecls();
   compileSubDecls();
 
-  updateJ(jmp,getCurrentCodeAddress());
+  updateJ(jmp, getCurrentCodeAddress());
   genINT(symtab->currentScope->frameSize);
 
   eat(KW_BEGIN);
@@ -136,17 +155,21 @@ void compileBlock(void) {
   eat(KW_END);
 }
 
-void compileSubDecls(void) {
-  while ((lookAhead->tokenType == KW_FUNCTION) || (lookAhead->tokenType == KW_PROCEDURE)) {
+void compileSubDecls(void)
+{
+  while ((lookAhead->tokenType == KW_FUNCTION) || (lookAhead->tokenType == KW_PROCEDURE))
+  {
     if (lookAhead->tokenType == KW_FUNCTION)
       compileFuncDecl();
-    else compileProcDecl();
+    else
+      compileProcDecl();
   }
 }
 
-void compileFuncDecl(void) {
-  Object* funcObj;
-  Type* returnType;
+void compileFuncDecl(void)
+{
+  Object *funcObj;
+  Type *returnType;
 
   eat(KW_FUNCTION);
   eat(TK_IDENT);
@@ -157,7 +180,7 @@ void compileFuncDecl(void) {
   declareObject(funcObj);
 
   enterBlock(funcObj->funcAttrs->scope);
-  
+
   compileParams();
 
   eat(SB_COLON);
@@ -174,8 +197,9 @@ void compileFuncDecl(void) {
   exitBlock();
 }
 
-void compileProcDecl(void) {
-  Object* procObj;
+void compileProcDecl(void)
+{
+  Object *procObj;
 
   eat(KW_PROCEDURE);
   eat(TK_IDENT);
@@ -198,11 +222,13 @@ void compileProcDecl(void) {
   exitBlock();
 }
 
-ConstantValue* compileUnsignedConstant(void) {
-  ConstantValue* constValue;
-  Object* obj;
+ConstantValue *compileUnsignedConstant(void)
+{
+  ConstantValue *constValue;
+  Object *obj;
 
-  switch (lookAhead->tokenType) {
+  switch (lookAhead->tokenType)
+  {
   case TK_NUMBER:
     eat(TK_NUMBER);
     constValue = makeIntConstant(currentToken->value);
@@ -225,10 +251,12 @@ ConstantValue* compileUnsignedConstant(void) {
   return constValue;
 }
 
-ConstantValue* compileConstant(void) {
-  ConstantValue* constValue;
+ConstantValue *compileConstant(void)
+{
+  ConstantValue *constValue;
 
-  switch (lookAhead->tokenType) {
+  switch (lookAhead->tokenType)
+  {
   case SB_PLUS:
     eat(SB_PLUS);
     constValue = compileConstant2();
@@ -236,7 +264,7 @@ ConstantValue* compileConstant(void) {
   case SB_MINUS:
     eat(SB_MINUS);
     constValue = compileConstant2();
-    constValue->intValue = - constValue->intValue;
+    constValue->intValue = -constValue->intValue;
     break;
   case TK_CHAR:
     eat(TK_CHAR);
@@ -249,11 +277,13 @@ ConstantValue* compileConstant(void) {
   return constValue;
 }
 
-ConstantValue* compileConstant2(void) {
-  ConstantValue* constValue;
-  Object* obj;
+ConstantValue *compileConstant2(void)
+{
+  ConstantValue *constValue;
+  Object *obj;
 
-  switch (lookAhead->tokenType) {
+  switch (lookAhead->tokenType)
+  {
   case TK_NUMBER:
     eat(TK_NUMBER);
     constValue = makeIntConstant(currentToken->value);
@@ -264,7 +294,7 @@ ConstantValue* compileConstant2(void) {
     if (obj->constAttrs->value->type == TP_INT)
       constValue = duplicateConstantValue(obj->constAttrs->value);
     else
-      error(ERR_UNDECLARED_INT_CONSTANT,currentToken->lineNo, currentToken->colNo);
+      error(ERR_UNDECLARED_INT_CONSTANT, currentToken->lineNo, currentToken->colNo);
     break;
   default:
     error(ERR_INVALID_CONSTANT, lookAhead->lineNo, lookAhead->colNo);
@@ -273,19 +303,21 @@ ConstantValue* compileConstant2(void) {
   return constValue;
 }
 
-Type* compileType(void) {
-  Type* type;
-  Type* elementType;
+Type *compileType(void)
+{
+  Type *type;
+  Type *elementType;
   int arraySize;
-  Object* obj;
+  Object *obj;
 
-  switch (lookAhead->tokenType) {
-  case KW_INTEGER: 
+  switch (lookAhead->tokenType)
+  {
+  case KW_INTEGER:
     eat(KW_INTEGER);
-    type =  makeIntType();
+    type = makeIntType();
     break;
-  case KW_CHAR: 
-    eat(KW_CHAR); 
+  case KW_CHAR:
+    eat(KW_CHAR);
     type = makeCharType();
     break;
   case KW_ARRAY:
@@ -312,16 +344,18 @@ Type* compileType(void) {
   return type;
 }
 
-Type* compileBasicType(void) {
-  Type* type;
+Type *compileBasicType(void)
+{
+  Type *type;
 
-  switch (lookAhead->tokenType) {
-  case KW_INTEGER: 
-    eat(KW_INTEGER); 
+  switch (lookAhead->tokenType)
+  {
+  case KW_INTEGER:
+    eat(KW_INTEGER);
     type = makeIntType();
     break;
-  case KW_CHAR: 
-    eat(KW_CHAR); 
+  case KW_CHAR:
+    eat(KW_CHAR);
     type = makeCharType();
     break;
   default:
@@ -331,11 +365,14 @@ Type* compileBasicType(void) {
   return type;
 }
 
-void compileParams(void) {
-  if (lookAhead->tokenType == SB_LPAR) {
+void compileParams(void)
+{
+  if (lookAhead->tokenType == SB_LPAR)
+  {
     eat(SB_LPAR);
     compileParam();
-    while (lookAhead->tokenType == SB_SEMICOLON) {
+    while (lookAhead->tokenType == SB_SEMICOLON)
+    {
       eat(SB_SEMICOLON);
       compileParam();
     }
@@ -343,12 +380,14 @@ void compileParams(void) {
   }
 }
 
-void compileParam(void) {
-  Object* param;
-  Type* type;
+void compileParam(void)
+{
+  Object *param;
+  Type *type;
   enum ParamKind paramKind = PARAM_VALUE;
 
-  if (lookAhead->tokenType == KW_VAR) {
+  if (lookAhead->tokenType == KW_VAR)
+  {
     paramKind = PARAM_REFERENCE;
     eat(KW_VAR);
   }
@@ -362,16 +401,20 @@ void compileParam(void) {
   declareObject(param);
 }
 
-void compileStatements(void) {
+void compileStatements(void)
+{
   compileStatement();
-  while (lookAhead->tokenType == SB_SEMICOLON) {
+  while (lookAhead->tokenType == SB_SEMICOLON)
+  {
     eat(SB_SEMICOLON);
     compileStatement();
   }
 }
 
-void compileStatement(void) {
-  switch (lookAhead->tokenType) {
+void compileStatement(void)
+{
+  switch (lookAhead->tokenType)
+  {
   case TK_IDENT:
     compileAssignSt();
     break;
@@ -402,19 +445,22 @@ void compileStatement(void) {
   }
 }
 
-Type* compileLValue(void) {
-  Object* var;
-  Type* varType;
+Type *compileLValue(void)
+{
+  Object *var;
+  Type *varType;
 
   eat(TK_IDENT);
-  
+
   var = checkDeclaredLValueIdent(currentToken->string);
 
-  switch (var->kind) {
+  switch (var->kind)
+  {
   case OBJ_VARIABLE:
     genVariableAddress(var);
 
-    if (var->varAttrs->type->typeClass == TP_ARRAY) {
+    if (var->varAttrs->type->typeClass == TP_ARRAY)
+    {
       varType = compileIndexes(var->varAttrs->type);
     }
     else
@@ -423,7 +469,8 @@ Type* compileLValue(void) {
   case OBJ_PARAMETER:
     if (var->paramAttrs->kind == PARAM_VALUE)
       genParameterAddress(var);
-    else genParameterValue(var);
+    else
+      genParameterValue(var);
 
     varType = var->paramAttrs->type;
     break;
@@ -431,28 +478,177 @@ Type* compileLValue(void) {
     genReturnValueAddress(var);
     varType = var->funcAttrs->returnType;
     break;
-  default: 
-    error(ERR_INVALID_LVALUE,currentToken->lineNo, currentToken->colNo);
+  default:
+    error(ERR_INVALID_LVALUE, currentToken->lineNo, currentToken->colNo);
   }
 
   return varType;
 }
 
-void compileAssignSt(void) {
-  Type* varType;
-  Type* expType;
+void compileAssignSt(void)
+{
+  // Biến cục bộ
+  Object *varList[MAX_VARS];
+  Type *varTypes[MAX_VARS];
+  int isArray[MAX_VARS];
+  int varCount = 0;
+  int exprCount = 0;
+  Type *expType;
+  int i;
 
-  varType = compileLValue();
-  
-  eat(SB_ASSIGN);
-  expType = compileExpression();
-  checkTypeEquality(varType, expType);
+  // --- BƯỚC 1: Parse danh sách biến vế trái (LHS) ---
+  while (1)
+  {
+    if (lookAhead->tokenType == TK_IDENT)
+    {
+      Object *var = checkDeclaredLValueIdent(lookAhead->string);
 
-  genST();
+      if (varCount < MAX_VARS)
+      {
+        varList[varCount] = var;
+
+        // Lấy kiểu dữ liệu
+        if (var->kind == OBJ_VARIABLE)
+          varTypes[varCount] = var->varAttrs->type;
+        else if (var->kind == OBJ_PARAMETER)
+          varTypes[varCount] = var->paramAttrs->type;
+        else if (var->kind == OBJ_FUNCTION)
+          varTypes[varCount] = var->funcAttrs->returnType;
+
+        eat(TK_IDENT);
+
+        // --- SỬA Ở ĐÂY: Xử lý mảng A(. i .) ---
+        if (lookAhead->tokenType == SB_LSEL)
+        {
+          isArray[varCount] = 1;
+
+          // 1. Sinh mã địa chỉ cơ sở (Base Address)
+          switch (var->kind)
+          {
+          case OBJ_VARIABLE:
+            genVariableAddress(var);
+            break;
+          case OBJ_PARAMETER:
+            if (var->paramAttrs->kind == PARAM_VALUE)
+              genParameterAddress(var);
+            else
+              genParameterValue(var);
+            break;
+          case OBJ_FUNCTION:
+            genReturnValueAddress(var);
+            break;
+          }
+          varTypes[varCount] = compileIndexes(varTypes[varCount]);
+        }
+        else
+        {
+          isArray[varCount] = 0;
+        }
+
+        varCount++;
+      }
+      else
+      {
+        error(ERR_INVALID_STATEMENT, lookAhead->lineNo, lookAhead->colNo);
+      }
+    }
+    else
+    {
+      error(ERR_INVALID_LVALUE, lookAhead->lineNo, lookAhead->colNo);
+    }
+
+    if (lookAhead->tokenType == SB_COMMA)
+    {
+      eat(SB_COMMA);
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  // --- BƯỚC 2: Ăn dấu gán := ---
+  if (lookAhead->tokenType == SB_ASSIGN)
+  {
+    eat(SB_ASSIGN);
+  }
+  else if (lookAhead->tokenType == SB_ASSIGN2)
+  {
+    eat(SB_ASSIGN2); // Chấp nhận ::=
+  }
+  else
+  {
+    error(ERR_INVALID_ARGUMENTS, lookAhead->lineNo, lookAhead->colNo);
+  }
+
+  // --- BƯỚC 3: Parse danh sách biểu thức vế phải (RHS) ---
+  while (1)
+  {
+    if (exprCount >= varCount)
+    {
+      error(ERR_INVALID_STATEMENT, lookAhead->lineNo, lookAhead->colNo);
+    }
+
+    // Compile biểu thức bên phải
+    expType = compileExpression();
+
+    // [DEBUG] Kiểm tra kiểu trước khi so sánh
+    printf("DEBUG: Checking Assign [%d]: VarTypeClass=%d vs ExpTypeClass=%d\n",
+           exprCount, varTypes[exprCount]->typeClass, expType->typeClass);
+
+    // So sánh kiểu: Var[i] phải tương thích với Expr[i]
+    checkTypeEquality(varTypes[exprCount], expType);
+
+    exprCount++;
+
+    if (lookAhead->tokenType == SB_COMMA)
+    {
+      eat(SB_COMMA);
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  if (exprCount != varCount)
+  {
+    error(ERR_INVALID_STATEMENT, lookAhead->lineNo, lookAhead->colNo);
+  }
+
+  // --- BƯỚC 4: Sinh mã gán (Code Generation) ---
+  // Duyệt ngược để đảm bảo thứ tự Stack: [Val1, Val2] -> Store Val2 -> Store Val1
+  for (i = varCount - 1; i >= 0; i--)
+  {
+    if (!isArray[i])
+    {
+      switch (varList[i]->kind)
+      {
+      case OBJ_VARIABLE:
+        genVariableAddress(varList[i]);
+        break;
+      case OBJ_PARAMETER:
+        if (varList[i]->paramAttrs->kind == PARAM_VALUE)
+          genParameterAddress(varList[i]);
+        else
+          genParameterValue(varList[i]);
+        break;
+      case OBJ_FUNCTION:
+        genReturnValueAddress(varList[i]);
+        break;
+      }
+      // Stack: [Val, Addr] -> Cần SWAP để thành [Addr, Val] cho lệnh ST
+      genSW();
+    }
+
+    // Gọi lệnh Store
+    genST();
+  }
 }
 
-void compileCallSt(void) {
-  Object* proc;
+void compileCallSt(void)
+{
+  Object *proc;
 
   eat(KW_CALL);
   eat(TK_IDENT);
@@ -461,7 +657,8 @@ void compileCallSt(void) {
   /* --- BẮT ĐẦU SỬA ĐỔI --- */
 
   // 1. Xử lý riêng cho thủ tục READI
-  if (proc != NULL && strcmp(proc->name, "READI") == 0) {
+  if (proc != NULL && strcmp(proc->name, "READI") == 0)
+  {
     eat(SB_LPAR);
 
     // READI bắt buộc tham số phải là một L-Value (biến để lưu giá trị)
@@ -474,31 +671,40 @@ void compileCallSt(void) {
     eat(SB_RPAR);
   }
   // 2. Xử lý riêng cho thủ tục READC (nếu bạn muốn hỗ trợ đọc ký tự)
-  else if (proc != NULL && strcmp(proc->name, "READC") == 0) {
+  else if (proc != NULL && strcmp(proc->name, "READC") == 0)
+  {
     eat(SB_LPAR);
     compileLValue(); // Load Address
-    genRC();      // Read Char
-    genST();      // Store
+    genRC();         // Read Char
+    genST();         // Store
     eat(SB_RPAR);
   }
   // 3. Xử lý cho các thủ tục thông thường hoặc WRITEI
-  else {
-    if (proc == NULL) {
+  else
+  {
+    if (proc == NULL)
+    {
       // Nếu không tìm thấy trong SymTab, kiểm tra xem có phải hàm hệ thống khác không
       // (Dành cho trường hợp code cũ hoặc các predefined khác)
-      if (isPredefinedFunction(proc)){
+      if (isPredefinedFunction(proc))
+      {
         // Lưu ý: Đoạn này trong code gốc của bạn có vẻ logic chưa chặt chẽ vì proc là NULL
         // Nhưng ta cứ giữ nguyên logic gốc cho phần else này
         compileArguments(proc->funcAttrs->paramList);
         genPredefinedFunctionCall(proc);
       }
       // Hoặc báo lỗi nếu cần
-    } else {
-      if (isPredefinedProcedure(proc)) {
+    }
+    else
+    {
+      if (isPredefinedProcedure(proc))
+      {
         // Dành cho WRITEI, WRITELN
         compileArguments(proc->procAttrs->paramList);
         genPredefinedProcedureCall(proc);
-      } else {
+      }
+      else
+      {
         // Dành cho thủ tục người dùng tự viết
         genINT(RESERVED_WORDS);
         compileArguments(proc->procAttrs->paramList);
@@ -509,15 +715,17 @@ void compileCallSt(void) {
   }
 }
 
-void compileGroupSt(void) {
+void compileGroupSt(void)
+{
   eat(KW_BEGIN);
   compileStatements();
   eat(KW_END);
 }
 
-void compileIfSt(void) {
-  Instruction* fjInstruction;
-  Instruction* jInstruction;
+void compileIfSt(void)
+{
+  Instruction *fjInstruction;
+  Instruction *jInstruction;
 
   eat(KW_IF);
   compileCondition();
@@ -525,20 +733,24 @@ void compileIfSt(void) {
 
   fjInstruction = genFJ(DC_VALUE);
   compileStatement();
-  if (lookAhead->tokenType == KW_ELSE) {
+  if (lookAhead->tokenType == KW_ELSE)
+  {
     jInstruction = genJ(DC_VALUE);
     updateFJ(fjInstruction, getCurrentCodeAddress());
     eat(KW_ELSE);
     compileStatement();
     updateJ(jInstruction, getCurrentCodeAddress());
-  } else {
+  }
+  else
+  {
     updateFJ(fjInstruction, getCurrentCodeAddress());
   }
 }
 
-void compileWhileSt(void) {
+void compileWhileSt(void)
+{
   CodeAddress beginWhile;
-  Instruction* fjInstruction;
+  Instruction *fjInstruction;
 
   beginWhile = getCurrentCodeAddress();
   eat(KW_WHILE);
@@ -550,10 +762,11 @@ void compileWhileSt(void) {
   updateFJ(fjInstruction, getCurrentCodeAddress());
 }
 
-void compileForSt(void) {
+void compileForSt(void)
+{
   CodeAddress beginLoop;
-  Instruction* fjInstruction;
-  Type* varType;
+  Instruction *fjInstruction;
+  Type *varType;
   Type *type;
 
   eat(KW_FOR);
@@ -578,7 +791,7 @@ void compileForSt(void) {
   eat(KW_DO);
   compileStatement();
 
-  genCV();  
+  genCV();
   genCV();
   genLI();
   genLC(1);
@@ -591,25 +804,30 @@ void compileForSt(void) {
   genJ(beginLoop);
   updateFJ(fjInstruction, getCurrentCodeAddress());
   genDCT(1);
-
 }
 
-void compileArgument(Object* param) {
-  Type* type;
+void compileArgument(Object *param)
+{
+  Type *type;
 
-  if (param->paramAttrs->kind == PARAM_VALUE) {
+  if (param->paramAttrs->kind == PARAM_VALUE)
+  {
     type = compileExpression();
     checkTypeEquality(type, param->paramAttrs->type);
-  } else {
+  }
+  else
+  {
     type = compileLValue();
     checkTypeEquality(type, param->paramAttrs->type);
   }
 }
 
-void compileArguments(ObjectNode* paramList) {
-  ObjectNode* node = paramList;
+void compileArguments(ObjectNode *paramList)
+{
+  ObjectNode *node = paramList;
 
-  switch (lookAhead->tokenType) {
+  switch (lookAhead->tokenType)
+  {
   case SB_LPAR:
     eat(SB_LPAR);
     if (node == NULL)
@@ -617,20 +835,21 @@ void compileArguments(ObjectNode* paramList) {
     compileArgument(node->object);
     node = node->next;
 
-    while (lookAhead->tokenType == SB_COMMA) {
+    while (lookAhead->tokenType == SB_COMMA)
+    {
       eat(SB_COMMA);
       if (node == NULL)
-	error(ERR_PARAMETERS_ARGUMENTS_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
+        error(ERR_PARAMETERS_ARGUMENTS_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
       compileArgument(node->object);
       node = node->next;
     }
 
     if (node != NULL)
       error(ERR_PARAMETERS_ARGUMENTS_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
-    
+
     eat(SB_RPAR);
     break;
-    // Check FOLLOW set 
+    // Check FOLLOW set
   case SB_TIMES:
   case SB_SLASH:
   case SB_PLUS:
@@ -656,16 +875,18 @@ void compileArguments(ObjectNode* paramList) {
   }
 }
 
-void compileCondition(void) {
-  Type* type1;
-  Type* type2;
+void compileCondition(void)
+{
+  Type *type1;
+  Type *type2;
   TokenType op;
 
   type1 = compileExpression();
   checkBasicType(type1);
 
   op = lookAhead->tokenType;
-  switch (op) {
+  switch (op)
+  {
   case SB_EQ:
     eat(SB_EQ);
     break;
@@ -689,9 +910,10 @@ void compileCondition(void) {
   }
 
   type2 = compileExpression();
-  checkTypeEquality(type1,type2);
+  checkTypeEquality(type1, type2);
 
-  switch (op) {
+  switch (op)
+  {
   case SB_EQ:
     genEQ();
     break;
@@ -713,13 +935,14 @@ void compileCondition(void) {
   default:
     break;
   }
-
 }
 
-Type* compileExpression(void) {
-  Type* type;
-  
-  switch (lookAhead->tokenType) {
+Type *compileExpression(void)
+{
+  Type *type;
+
+  switch (lookAhead->tokenType)
+  {
   case SB_PLUS:
     eat(SB_PLUS);
     type = compileExpression2();
@@ -737,8 +960,9 @@ Type* compileExpression(void) {
   return type;
 }
 
-Type* compileExpression2(void) {
-  Type* type;
+Type *compileExpression2(void)
+{
+  Type *type;
 
   type = compileTerm();
   type = compileExpression3(type);
@@ -746,12 +970,13 @@ Type* compileExpression2(void) {
   return type;
 }
 
+Type *compileExpression3(Type *argType1)
+{
+  Type *argType2;
+  Type *resultType;
 
-Type* compileExpression3(Type* argType1) {
-  Type* argType2;
-  Type* resultType;
-
-  switch (lookAhead->tokenType) {
+  switch (lookAhead->tokenType)
+  {
   case SB_PLUS:
     eat(SB_PLUS);
     checkIntType(argType1);
@@ -796,19 +1021,22 @@ Type* compileExpression3(Type* argType1) {
   return resultType;
 }
 
-Type* compileTerm(void) {
-  Type* type;
+Type *compileTerm(void)
+{
+  Type *type;
   type = compileFactor();
   type = compileTerm2(type);
 
   return type;
 }
 
-Type* compileTerm2(Type* argType1) {
-  Type* argType2;
-  Type* resultType;
+Type *compileTerm2(Type *argType1)
+{
+  Type *argType2;
+  Type *resultType;
 
-  switch (lookAhead->tokenType) {
+  switch (lookAhead->tokenType)
+  {
   case SB_TIMES:
     eat(SB_TIMES);
     checkIntType(argType1);
@@ -855,11 +1083,13 @@ Type* compileTerm2(Type* argType1) {
   return resultType;
 }
 
-Type* compileFactor(void) {
-  Type* type;
-  Object* obj;
+Type *compileFactor(void)
+{
+  Type *type;
+  Object *obj;
 
-  switch (lookAhead->tokenType) {
+  switch (lookAhead->tokenType)
+  {
   case TK_NUMBER:
     eat(TK_NUMBER);
     type = intType;
@@ -874,51 +1104,75 @@ Type* compileFactor(void) {
     eat(TK_IDENT);
     obj = checkDeclaredIdent(currentToken->string);
 
-    switch (obj->kind) {
+    switch (obj->kind)
+    {
     case OBJ_CONSTANT:
-      switch (obj->constAttrs->value->type) {
+      switch (obj->constAttrs->value->type)
+      {
       case TP_INT:
-	type = intType;
-	genLC(obj->constAttrs->value->intValue);
-	break;
+        type = intType;
+        genLC(obj->constAttrs->value->intValue);
+        break;
       case TP_CHAR:
-	type = charType;
-	genLC(obj->constAttrs->value->charValue);
-	break;
+        type = charType;
+        genLC(obj->constAttrs->value->charValue);
+        break;
       default:
-	break;
+        break;
       }
       break;
     case OBJ_VARIABLE:
-      if (obj->varAttrs->type->typeClass == TP_ARRAY) {
-	genVariableAddress(obj);
-	type = compileIndexes(obj->varAttrs->type);
-	genLI();
-      } else {
-	type = obj->varAttrs->type;
-	genVariableValue(obj);
+      if (obj->varAttrs->type->typeClass == TP_ARRAY)
+      {
+        genVariableAddress(obj);
+        type = compileIndexes(obj->varAttrs->type);
+        genLI();
+      }
+      else
+      {
+        type = obj->varAttrs->type;
+        genVariableValue(obj);
       }
       break;
     case OBJ_PARAMETER:
       type = obj->paramAttrs->type;
       genParameterValue(obj);
       if (obj->paramAttrs->kind == PARAM_REFERENCE)
-	genLI();
+        genLI();
       break;
     case OBJ_FUNCTION:
-      if (isPredefinedFunction(obj)) {
-	compileArguments(obj->funcAttrs->paramList);
-	genPredefinedFunctionCall(obj);
-      } else {
-	genINT(4);
-	compileArguments(obj->funcAttrs->paramList);
-	genDCT(4+obj->funcAttrs->paramCount);
-	genFunctionCall(obj);
+      if (isPredefinedFunction(obj))
+      {
+        compileArguments(obj->funcAttrs->paramList);
+        genPredefinedFunctionCall(obj);
+      }
+      else
+      {
+        genINT(4);
+        compileArguments(obj->funcAttrs->paramList);
+        genDCT(4 + obj->funcAttrs->paramCount);
+        genFunctionCall(obj);
       }
       type = obj->funcAttrs->returnType;
       break;
-    default: 
-      error(ERR_INVALID_FACTOR,currentToken->lineNo, currentToken->colNo);
+    case OBJ_PROCEDURE:
+      if (obj == readcProcedure)
+      {
+        genPredefinedFunctionCall(obj);
+        return charType; // <--- QUAN TRỌNG: Phải trả về kiểu Char
+      }
+      else if (obj == readiProcedure)
+      {
+        genPredefinedFunctionCall(obj);
+        return intType; // <--- QUAN TRỌNG: Phải trả về kiểu Int
+      }
+      else
+      {
+        error(ERR_INVALID_FACTOR, lookAhead->lineNo, lookAhead->colNo);
+      }
+      break;
+    default:
+      error(ERR_INVALID_FACTOR, currentToken->lineNo, currentToken->colNo);
       break;
     }
     break;
@@ -930,15 +1184,16 @@ Type* compileFactor(void) {
   default:
     error(ERR_INVALID_FACTOR, lookAhead->lineNo, lookAhead->colNo);
   }
-  
+
   return type;
 }
 
-Type* compileIndexes(Type* arrayType) {
-  Type* type;
+Type *compileIndexes(Type *arrayType)
+{
+  Type *type;
 
-  
-  while (lookAhead->tokenType == SB_LSEL) {
+  while (lookAhead->tokenType == SB_LSEL)
+  {
     eat(SB_LSEL);
     type = compileExpression();
     checkIntType(type);
@@ -955,7 +1210,8 @@ Type* compileIndexes(Type* arrayType) {
   return arrayType;
 }
 
-int compile(char *fileName) {
+int compile(char *fileName)
+{
   if (openInputStream(fileName) == IO_ERROR)
     return IO_ERROR;
 
@@ -971,5 +1227,4 @@ int compile(char *fileName) {
   free(lookAhead);
   closeInputStream();
   return IO_SUCCESS;
-
 }

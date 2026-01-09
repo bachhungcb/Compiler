@@ -169,9 +169,11 @@ Object* createVariableObject(char *name);
 Object* createFunctionObject(char *name);
 Object* createProcedureObject(char *name);
 Object* createParameterObject(char *name, enum ParamKind kind);
-
+extern Object* readcProcedure;
+extern Object* readiProcedure;
 Object* findObject(ObjectNode *objList, char *name);
-
+extern Type* intType;
+extern Type* charType;
 void initSymTab(void);
 void cleanSymTab(void);
 void enterBlock(Scope* scope);

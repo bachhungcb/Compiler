@@ -27,6 +27,6 @@ BEGIN
     BEGIN  
       I:=0;  
       CALL  HANOI(N,P,Q);  
-      CALL  WRITELN;
+      CALL  WRITELN  
     END
 END.  (* TOWER OF HANOI *)

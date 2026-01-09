@@ -1,0 +1,58 @@
+PROGRAM  EXAMPLE4;  (* Example 4 *)
+CONST MAX = 10;
+TYPE T = INTEGER;
+VAR  A : ARRAY(. 100 .) OF T;
+     N : INTEGER;
+     CH : CHAR;
+
+PROCEDURE INPUT;
+VAR I : INTEGER;
+    TMP : INTEGER;
+BEGIN
+  Call WriteLn;
+  Call WriteC('I'); Call WriteC('n'); Call WriteC('=');
+  Call ReadI(N);
+  FOR I := 1 TO N DO
+  Begin
+     Call WriteC('A'); Call WriteC('['); Call WriteI(i); Call WriteC(']'); Call WriteC('=');
+     Call ReadI(A(.I.));
+  END;
+END;
+
+PROCEDURE OUTPUT;
+VAR I : INTEGER;
+BEGIN
+Call WriteC('A'); Call WriteC('r'); Call WriteC('r'); Call WriteC('=');
+  FOR I := 1 TO N DO
+     BEGIN
+       CALL WRITEI(A(.I.));
+       CALL WRITEC(' ');
+     END;
+  CALL WRiteLn;
+END;
+
+FUNCTION SUM : INTEGER;
+VAR I: INTEGER;
+    S : INTEGER;
+BEGIN
+    S := 0;
+    I := 1;
+    WHILE I <= N DO
+     BEGIN
+       S := S + A(.I.);
+       I := I + 1;
+     END;
+    SUM := S;
+END;
+
+BEGIN
+   CH := 'y';
+   WHILE CH = 'y' DO
+     BEGIN
+       CALL INPUT;
+       CALL OUTPUT;
+       Call WriteC('S'); Call WriteC('u'); Call WriteC('m'); Call WriteC('=');
+       CALL WRITEI(SUM);
+       CH := READC;
+     END
+END.  (* Example 4 *)

@@ -48,7 +48,7 @@ enum OpCode {
   OP_LT,   // Less             t := t - 1;  if s[t] < s[t+1] then s[t] := 1 else s[t] := 0;
   OP_GE,   // Greater or Equal t := t - 1;  if s[t] >= s[t+1] then s[t] := 1 else s[t] := 0;
   OP_LE,   // Less or Equal    t := t - 1;  if s[t] >= s[t+1] then s[t] := 1 else s[t] := 0;
-
+  OP_SW,   // Swap
   OP_BP    // Break point. Just for debugging
 };
 
@@ -104,7 +104,7 @@ int emitGT(CodeBlock* codeBlock);
 int emitLT(CodeBlock* codeBlock);
 int emitGE(CodeBlock* codeBlock);
 int emitLE(CodeBlock* codeBlock);
-
+int emitSW(CodeBlock* codeBlock);
 int emitBP(CodeBlock* codeBlock);
 
 void printInstruction(Instruction* instruction);

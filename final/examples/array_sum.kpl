@@ -1,0 +1,36 @@
+Program sumArray;
+
+Const MAX = 50;
+Type MyArray = Array(. 50 .) of Integer;
+Var A: MyArray;
+		n: Integer;
+		i: Integer;
+		Sum: Integer;
+
+Procedure inputArray( n: Integer);
+Begin
+	For i := 1 To n Do
+	Begin
+		Call WriteC('A'); Call WriteC('['); Call WriteI(i); Call WriteC(']'); Call WriteC('=');
+		Call ReadI(A(. i .));
+	End;
+End;
+
+Begin
+	Call WriteC('N'); Call WriteC('=');
+	Call ReadI(n);
+	
+	Call inputArray(n);
+	
+	Sum := 0;
+	
+	For i := 1 To n Do
+        Begin
+            Sum := Sum + A(. i .);
+        End;
+
+    (* 4. In kết quả *)
+    Call WriteC('S'); Call WriteC('=');
+    Call WriteI(Sum);
+    Call WriteLn;
+End.

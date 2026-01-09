@@ -65,6 +65,7 @@ int emitGT(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_GT, DC_VALUE, D
 int emitLT(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_LT, DC_VALUE, DC_VALUE); }
 int emitGE(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_GE, DC_VALUE, DC_VALUE); }
 int emitLE(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_LE, DC_VALUE, DC_VALUE); }
+int emitSW(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_SW, DC_VALUE, DC_VALUE); }
 
 int emitBP(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_BP, DC_VALUE, DC_VALUE); }
 
@@ -101,7 +102,7 @@ void printInstruction(Instruction* inst) {
   case OP_LT: printf("LT"); break;
   case OP_GE: printf("GE"); break;
   case OP_LE: printf("LE"); break;
-
+  case OP_SW: printf("SW"); break;  
   case OP_BP: printf("BP"); break;
   default: break;
   }
@@ -139,7 +140,7 @@ void sprintInstruction(char* s, Instruction* inst) {
   case OP_LT: sprintf(s,"LT"); break;
   case OP_GE: sprintf(s,"GE"); break;
   case OP_LE: sprintf(s,"LE"); break;
-
+  case OP_SW: sprintf(s,"SW"); break;
   case OP_BP: sprintf(s,"BP"); break;
   default: break;
   }

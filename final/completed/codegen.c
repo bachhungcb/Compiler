@@ -215,6 +215,10 @@ void genLE(void) {
   emitLE(codeBlock);
 }
 
+void genSW(void) {
+  emitSW(codeBlock);
+}
+
 void updateJ(Instruction* jmp, CodeAddress label) {
   jmp->q = label;
 }

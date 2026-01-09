@@ -265,6 +265,13 @@ int run(void) {
       // Just for debugging
       debugMode = 1;
       break;
+    case OP_SW: 
+      {
+        int temp = stack[t];
+        stack[t] = stack[t-1];
+        stack[t-1] = temp;
+      }
+      break;
     default: break;
     }
 
