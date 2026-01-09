@@ -1,0 +1,15 @@
+Program KiemTra;
+
+Var x: Integer;
+Begin
+	Call WriteC('X');
+	Call WriteC('=');
+	Call ReadI(x);
+	
+	If x > 10 Then
+		Call WriteC('L')
+	Else 
+		Call WriteC('S');
+	
+	Call WriteLn;
+End.

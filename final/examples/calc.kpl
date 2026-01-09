@@ -1,0 +1,40 @@
+Program CalcExample;
+VAR x: Integer;
+		y: Integer;
+		sq: Integer;
+
+Function Square(n: Integer) : Integer;
+Begin
+	Square := n * n;
+End;
+
+Procedure Swap (VAR a: Integer; VAR b: Integer);
+VAR temp: Integer;
+Begin
+	temp := a;
+	a := b;
+	b := temp;
+End;
+
+Begin
+		(* Test Hàm Square *)
+    x := 5;
+    sq := Square(x);
+    Call WriteC('S'); Call WriteC('q'); Call WriteC('=');
+    Call WriteI(sq); (* In ra 25 *)
+    Call WriteLn;
+
+    (* Test Thủ tục Swap *)
+    x := 10;
+    y := 20;
+    
+    Call WriteC('B'); Call WriteC('e'); Call WriteC('f'); Call WriteC(':');
+    Call WriteI(x); Call WriteC(' '); Call WriteI(y); (* In: 10 20 *)
+    Call WriteLn;
+
+    Call Swap(x, y); (* Gọi thủ tục *)
+
+    Call WriteC('A'); Call WriteC('f'); Call WriteC('t'); Call WriteC(':');
+    Call WriteI(x); Call WriteC(' '); Call WriteI(y); (* In: 20 10 *)
+    Call WriteLn;
+End.

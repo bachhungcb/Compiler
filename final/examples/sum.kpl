@@ -1,0 +1,17 @@
+Program Sum;
+Var a: Integer;
+		b: Integer;
+		S: Integer;
+Begin
+	a:=10;
+	b:=20;
+	
+	S := a + b;
+	
+	Call WriteC('S'); 
+	Call WriteC('U');
+	Call WriteC('M');
+	Call WriteC('=');
+	Call WriteI(S);
+	Call WriteLn;
+End.

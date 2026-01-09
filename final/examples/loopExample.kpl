@@ -1,0 +1,12 @@
+Program LoopExample;
+Var i: Integer;
+    n: Integer;
+Begin
+	n:=5;
+	
+	For i:=1 To n Do
+		Begin
+			Call WriteI(i);
+			Call WriteLn;
+		End;
+End.

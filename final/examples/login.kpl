@@ -1,0 +1,27 @@
+Program login
+
+var n: Integer;
+		i: Integer;
+
+Begin
+	n := 1234;
+	(* In prompt nhac nhap lieu: PIN: *)
+  Call WriteC('P'); Call WriteC('I'); Call WriteC('N'); Call WriteC(':');
+  Call WriteC(' ');
+  
+	Call ReadI(i);
+	Call WriteLn;
+	If i == n Then
+		Begin
+			Call WriteC('O');
+			Call WriteC('K');
+		End
+	Else
+		Begin
+			Call WriteC('E');
+			Call WriteC('R');
+			Call WriteC('R');
+		End;
+		
+	Call WriteLn;	
+End;
