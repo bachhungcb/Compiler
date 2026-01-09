@@ -1,0 +1,11 @@
+Program Example1; (* Example 1 *)
+VAR N:INTEGER;
+    I:INTEGER;
+
+Begin
+	FOR N := 1 TO 100 DO
+    BEGIN
+          CALL  WRITEC(' ');
+          CALL  WRITEI(N);
+    END
+End. (* Example 1 *)

@@ -21,13 +21,6 @@ BEGIN
 END;  (*END OF HANOI*)
 
 BEGIN
-  FOR  N := 1  TO  4  DO  
-    BEGIN
-      FOR  I:=1  TO  4  DO  
-        CALL  WRITEC(' ');
-      CALL READC(C);  
-      CALL WRITEC(C);
-    END;
   P:=1;  
   Q:=2;
   FOR  N:=2  TO  4  DO
