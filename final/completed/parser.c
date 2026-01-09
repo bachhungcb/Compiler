@@ -568,15 +568,18 @@ void compileAssignSt(void)
   }
 
   // --- BƯỚC 2: Ăn dấu gán := ---
-if (lookAhead->tokenType == SB_ASSIGN) {
-      eat(SB_ASSIGN);  // Ăn dấu :=
-  } 
-  else if (lookAhead->tokenType == SB_ASSIGN2) {
-      eat(SB_ASSIGN2); // Ăn dấu ::=
-  } 
-  else {
-      // Nếu không phải cả 2, báo lỗi "Thiếu dấu gán"
-      error(ERR_INVALID_ARGUMENTS, lookAhead->lineNo, lookAhead->colNo);
+  if (lookAhead->tokenType == SB_ASSIGN)
+  {
+    eat(SB_ASSIGN); // Ăn dấu :=
+  }
+  else if (lookAhead->tokenType == SB_ASSIGN2)
+  {
+    eat(SB_ASSIGN2); // Ăn dấu ::=
+  }
+  else
+  {
+    // Nếu không phải cả 2, báo lỗi "Thiếu dấu gán"
+    error(ERR_INVALID_ARGUMENTS, lookAhead->lineNo, lookAhead->colNo);
   }
 
   // --- BƯỚC 3: Parse danh sách biểu thức vế phải (RHS) ---
@@ -1086,6 +1089,10 @@ Type *compileFactor(void)
   Type *type;
   Object *obj;
 
+  Instruction *fjInstruction;
+  Instruction *jInstruction;
+  Type *type2;
+
   switch (lookAhead->tokenType)
   {
   case TK_NUMBER:
@@ -1174,38 +1181,39 @@ Type *compileFactor(void)
       break;
     }
     break;
+  case KW_IF:
+    eat(KW_IF);
+    compileCondition();
+
+    // 1. Nếu điều kiện sai -> Nhảy đến Else
+    fjInstruction = genFJ(DC_VALUE);
+
+    // 2. Nhánh True
+    eat(KW_RETURN);
+    type = compileExpression();
+
+    // 3. Xử lý xong nhánh True -> Nhảy đến cuối (bỏ qua Else)
+    jInstruction = genJ(DC_VALUE);
+
+    // 4. Bắt đầu nhánh Else (Cập nhật địa chỉ nhảy FJ ở bước 1 vào đây)
+    updateFJ(fjInstruction, getCurrentCodeAddress());
+
+    eat(KW_ELSE);
+    eat(KW_RETURN);
+    type2 = compileExpression();
+
+    // 5. Kiểm tra kiểu dữ liệu: Cả 2 nhánh phải trả về cùng kiểu
+    checkTypeEquality(type, type2);
+
+    // 6. Cập nhật địa chỉ nhảy J ở bước 3 vào đây (Kết thúc Else)
+    updateJ(jInstruction, getCurrentCodeAddress());
+    break;
   case SB_LPAR:
     eat(SB_LPAR);
     type = compileExpression();
     eat(SB_RPAR);
     break;
-  case KW_IF:
-      eat(KW_IF);
-      compileCondition();
-      
-      // 1. Nếu điều kiện sai -> Nhảy đến Else
-      fjInstruction = genFJ(DC_VALUE);
-      
-      // 2. Nhánh True
-      eat(KW_RETURN);
-      type = compileExpression();
-      
-      // 3. Xử lý xong nhánh True -> Nhảy đến cuối (bỏ qua Else)
-      jInstruction = genJ(DC_VALUE);
-      
-      // 4. Bắt đầu nhánh Else (Cập nhật địa chỉ nhảy FJ ở bước 1 vào đây)
-      updateFJ(fjInstruction, getCurrentCodeAddress());
-      
-      eat(KW_ELSE);
-      eat(KW_RETURN);
-      type2 = compileExpression();
-      
-      // 5. Kiểm tra kiểu dữ liệu: Cả 2 nhánh phải trả về cùng kiểu
-      checkTypeEquality(type, type2);
-      
-      // 6. Cập nhật địa chỉ nhảy J ở bước 3 vào đây (Kết thúc Else)
-      updateJ(jInstruction, getCurrentCodeAddress());
-      break;
+
   default:
     error(ERR_INVALID_FACTOR, lookAhead->lineNo, lookAhead->colNo);
   }
