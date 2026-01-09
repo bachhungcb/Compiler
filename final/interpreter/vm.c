@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <conio.h>
+#include <curses.h>
 
 #include "vm.h"
 
@@ -158,7 +158,7 @@ int run(void) {
     case OP_RC: 
       t ++;
 //      echo();
-      scanf("%c",&number);
+      scanf("%lc",&number);
 //      noecho();
       stack[t] = number;
       checkStack();
