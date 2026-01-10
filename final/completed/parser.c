@@ -1016,6 +1016,9 @@ Type *compileExpression3(Type *argType1)
   case KW_THEN:
     resultType = argType1;
     break;
+  case KW_RETURN:
+    resultType = argType1;
+    break;
   default:
     error(ERR_INVALID_EXPRESSION, lookAhead->lineNo, lookAhead->colNo);
   }
@@ -1076,6 +1079,9 @@ Type *compileTerm2(Type *argType1)
   case KW_END:
   case KW_ELSE:
   case KW_THEN:
+    resultType = argType1;
+    break;
+  case KW_RETURN:
     resultType = argType1;
     break;
   default:

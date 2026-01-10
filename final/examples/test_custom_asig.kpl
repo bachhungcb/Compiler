@@ -2,7 +2,7 @@ Program TestCustom;
 Var x : Integer;
     n : Integer;
 Begin
-    n := 10;
+    n := 1;
     
     (* Dùng cú pháp mới ::= kết hợp If-Return *)
     x ::= If n > 5 Return 100 Else Return 0;
