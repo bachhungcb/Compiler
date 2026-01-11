@@ -1,0 +1,13 @@
+Program abs;
+
+Var a : Integer;
+
+Begin
+    Call WriteC('a'); Call WriteC('=');
+    Call ReadI(a);
+
+    a ::= If a < 0 return -a Else return a;
+
+    Call WriteC('a'); Call WriteC('=');
+    Call WriteI(a);
+End.

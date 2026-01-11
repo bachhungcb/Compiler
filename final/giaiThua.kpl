@@ -1,0 +1,26 @@
+Program giaiThua;
+
+Var n : Integer;
+    prod : Integer;
+    i : Integer;
+
+Begin (*int main*()*)
+    prod := 1;
+    Call WriteC('n'); Call WriteC('=');
+    Call ReadI(n); (*nhap vao so va luu vao bien*)
+
+    If n = 0 Then
+        Begin
+            Call WriteC('P'); Call WriteC('r');Call WriteC('o'); Call WriteC('d'); Call WriteC('=');
+            Call WriteC('1');
+        End
+    Else
+        Begin
+            For i := 1 To n Do (*for(int i = 1; i < n; i++)*)
+            Begin
+                prod := prod * i;
+            End;
+            Call WriteC('P'); Call WriteC('r');Call WriteC('o'); Call WriteC('d'); Call WriteC('=');
+            Call WriteI(prod);
+        End;
+End. (*Ket thuc bang dau cham*)
