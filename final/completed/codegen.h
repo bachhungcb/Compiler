@@ -76,6 +76,8 @@ void genAD(void);
 void genSB(void);
 void genML(void);
 void genDV(void);
+void genMD(void);
+void genPOW(void);
 void genNEG(void);
 void genCV(void);
 void genEQ(void);

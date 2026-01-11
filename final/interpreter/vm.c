@@ -208,6 +208,31 @@ int run(void) {
 	else stack[t] /= stack[t+1];
       }
       break;
+    case OP_MD:
+      t --;
+      if (checkStack()) {
+	if (stack[t+1] == 0)
+	  ps = PS_DIVIDE_BY_ZERO;
+	else stack[t] %= stack[t+1];
+      }
+      break;
+    case OP_POW:
+      t --;
+      if (checkStack()) {
+        int base_val = stack[t];
+        int exp_val = stack[t+1];
+        int result = 1;
+        int i;
+        if (exp_val < 0) {
+          ps = PS_DIVIDE_BY_ZERO;  // Negative exponent error
+        } else {
+          for (i = 0; i < exp_val; i++) {
+            result *= base_val;
+          }
+          stack[t] = result;
+        }
+      }
+      break;
     case OP_NEG:
       stack[t] = - stack[t];
       break;

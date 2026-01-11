@@ -57,6 +57,8 @@ int emitAD(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_AD, DC_VALUE, D
 int emitSB(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_SB, DC_VALUE, DC_VALUE); }
 int emitML(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_ML, DC_VALUE, DC_VALUE); }
 int emitDV(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_DV, DC_VALUE, DC_VALUE); }
+int emitMD(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_MD, DC_VALUE, DC_VALUE); }
+int emitPOW(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_POW, DC_VALUE, DC_VALUE); }
 int emitNEG(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_NEG, DC_VALUE, DC_VALUE); }
 int emitCV(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_CV, DC_VALUE, DC_VALUE); }
 int emitEQ(CodeBlock* codeBlock) { return emitCode(codeBlock, OP_EQ, DC_VALUE, DC_VALUE); }
@@ -93,6 +95,8 @@ void printInstruction(Instruction* inst) {
   case OP_SB: printf("SB"); break;
   case OP_ML: printf("ML"); break;
   case OP_DV: printf("DV"); break;
+  case OP_MD: printf("MD"); break;
+  case OP_POW: printf("POW"); break;
   case OP_NEG: printf("NEG"); break;
   case OP_CV: printf("CV"); break;
   case OP_EQ: printf("EQ"); break;

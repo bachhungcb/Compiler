@@ -163,11 +163,22 @@ Token *getToken(void)
     readChar();
     return token;
   case CHAR_TIMES:
-    token = makeToken(SB_TIMES, lineNo, colNo);
+    ln = lineNo;
+    cn = colNo;
     readChar();
-    return token;
+    if ((currentChar != EOF) && (charCodes[currentChar] == CHAR_TIMES))
+    {
+      readChar();
+      return makeToken(SB_POWER, ln, cn);
+    }
+    else
+      return makeToken(SB_TIMES, ln, cn);
   case CHAR_SLASH:
     token = makeToken(SB_SLASH, lineNo, colNo);
+    readChar();
+    return token;
+  case CHAR_PERCENT:
+    token = makeToken(SB_PERCENT, lineNo, colNo);
     readChar();
     return token;
   case CHAR_LT:
@@ -431,6 +442,12 @@ void printToken(Token *token)
     break;
   case SB_SLASH:
     printf("SB_SLASH\n");
+    break;
+  case SB_PERCENT:
+    printf("SB_PERCENT\n");
+    break;
+  case SB_POWER:
+    printf("SB_POWER\n");
     break;
   case SB_LPAR:
     printf("SB_LPAR\n");

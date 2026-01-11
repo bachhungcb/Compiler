@@ -1,0 +1,27 @@
+PROGRAM TestOperators;
+VAR a : INTEGER;
+    b : INTEGER;
+    c : INTEGER;
+
+BEGIN
+  (* Test power operator: 2 ** 3 = 8 *)
+  a := 2;
+  b := 3;
+  c := a ** b;
+  CALL WRITEI(c);
+  CALL WRITELN;
+  
+  (* Test modulo operator: 10 % 3 = 1 *)
+  a := 10;
+  b := 3;
+  c := a % b;
+  CALL WRITEI(c);
+  CALL WRITELN;
+  
+  (* Combine both: (2 ** 3) % 5 = 8 % 5 = 3 *)
+  a := 2;
+  b := 3;
+  c := a ** b % 5;
+  CALL WRITEI(c);
+  CALL WRITELN;
+END.

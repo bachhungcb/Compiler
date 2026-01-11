@@ -104,6 +104,8 @@ char *tokenToString(TokenType tokenType) {
   case SB_MINUS: return "\'-\'";
   case SB_TIMES: return "\'*\'";
   case SB_SLASH: return "\'/\'";
+  case SB_PERCENT: return "\'%\'";
+  case SB_POWER: return "\'**\'";
   case SB_LPAR: return "\'(\'";
   case SB_RPAR: return "\')\'";
   case SB_LSEL: return "\'(.\'";

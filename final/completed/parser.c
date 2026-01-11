@@ -853,6 +853,8 @@ void compileArguments(ObjectNode *paramList)
     // Check FOLLOW set
   case SB_TIMES:
   case SB_SLASH:
+  case SB_PERCENT:
+  case SB_POWER:
   case SB_PLUS:
   case SB_MINUS:
   case KW_TO:
@@ -1029,6 +1031,7 @@ Type *compileTerm(void)
 {
   Type *type;
   type = compileFactor();
+  type = compileFactor2(type);
   type = compileTerm2(type);
 
   return type;
@@ -1045,6 +1048,7 @@ Type *compileTerm2(Type *argType1)
     eat(SB_TIMES);
     checkIntType(argType1);
     argType2 = compileFactor();
+    argType2 = compileFactor2(argType2);
     checkIntType(argType2);
 
     genML();
@@ -1055,9 +1059,21 @@ Type *compileTerm2(Type *argType1)
     eat(SB_SLASH);
     checkIntType(argType1);
     argType2 = compileFactor();
+    argType2 = compileFactor2(argType2);
     checkIntType(argType2);
 
     genDV();
+
+    resultType = compileTerm2(argType1);
+    break;
+  case SB_PERCENT:
+    eat(SB_PERCENT);
+    checkIntType(argType1);
+    argType2 = compileFactor();
+    argType2 = compileFactor2(argType2);
+    checkIntType(argType2);
+
+    genMD();
 
     resultType = compileTerm2(argType1);
     break;
@@ -1225,6 +1241,55 @@ Type *compileFactor(void)
   }
 
   return type;
+}
+
+Type *compileFactor2(Type *argType1)
+{
+  Type *argType2;
+  Type *resultType;
+
+  switch (lookAhead->tokenType)
+  {
+  case SB_POWER:
+    eat(SB_POWER);
+    checkIntType(argType1);
+    argType2 = compileFactor();
+    checkIntType(argType2);
+
+    genPOW();
+
+    resultType = compileFactor2(argType1);
+    break;
+    // check the FOLLOW set
+  case SB_TIMES:
+  case SB_SLASH:
+  case SB_PERCENT:
+  case SB_PLUS:
+  case SB_MINUS:
+  case KW_TO:
+  case KW_DO:
+  case SB_RPAR:
+  case SB_COMMA:
+  case SB_EQ:
+  case SB_NEQ:
+  case SB_LE:
+  case SB_LT:
+  case SB_GE:
+  case SB_GT:
+  case SB_RSEL:
+  case SB_SEMICOLON:
+  case KW_END:
+  case KW_ELSE:
+  case KW_THEN:
+    resultType = argType1;
+    break;
+  case KW_RETURN:
+    resultType = argType1;
+    break;
+  default:
+    error(ERR_INVALID_FACTOR, lookAhead->lineNo, lookAhead->colNo);
+  }
+  return resultType;
 }
 
 Type *compileIndexes(Type *arrayType)
